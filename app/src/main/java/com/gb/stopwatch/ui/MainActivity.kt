@@ -1,66 +1,38 @@
 package com.gb.stopwatch.ui
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.gb.stopwatch.R
-import com.gb.stopwatch.data.StopwatchListOrchestrator
-import com.gb.stopwatch.data.StopwatchStateHolder
 import com.gb.stopwatch.databinding.ActivityMainBinding
-import com.gb.stopwatch.domain.ElapsedTimeCalculator
-import com.gb.stopwatch.domain.TimestampProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-
-    private val timestampProvider = object : TimestampProvider {
-        override fun getMilliseconds(): Long {
-            return System.currentTimeMillis()
-        }
-    }
-    private val stopwatchListOrchestrator = StopwatchListOrchestrator(
-        StopwatchStateHolder(
-            StopwatchStateCalculator(
-                timestampProvider,
-                ElapsedTimeCalculator(timestampProvider)
-            ),
-            ElapsedTimeCalculator(timestampProvider),
-            TimestampMillisecondsFormatter()
-        ),
-        CoroutineScope(
-            Dispatchers.Main
-                    + SupervisorJob()
-        )
-    )
+    private val viewModel: MainViewModel by viewModel()
+    private val mainScope: CoroutineScope by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val textView = findViewById<TextView>(R.id.text_time)
-        CoroutineScope(
-            Dispatchers.Main
-                    + SupervisorJob()
-        ).launch {
-            stopwatchListOrchestrator.ticker.collect {
+        val textView = binding.textTime
+        mainScope.launch {
+            viewModel.ticker.collect {
                 textView.text = it
             }
         }
 
         binding.buttonStart.setOnClickListener {
-            stopwatchListOrchestrator.start()
+            viewModel.start()
         }
         binding.buttonPause.setOnClickListener {
-            stopwatchListOrchestrator.pause()
+            viewModel.pause()
         }
         binding.buttonStop.setOnClickListener {
-            stopwatchListOrchestrator.stop()
+            viewModel.stop()
         }
-
     }
 }
