@@ -18,21 +18,38 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val textView = binding.textTime
+        val textTimeOne = binding.stopwatchOneLayout.textTime
+        val textTimeTwo = binding.stopwatchTwoLayout.textTime
         mainScope.launch {
-            viewModel.ticker.collect {
-                textView.text = it
+            viewModel.tickerOne.collect {
+                textTimeOne.text = it
             }
         }
 
-        binding.buttonStart.setOnClickListener {
-            viewModel.start()
+        mainScope.launch {
+            viewModel.tickerTwo.collect{
+                textTimeTwo.text = it
+            }
         }
-        binding.buttonPause.setOnClickListener {
-            viewModel.pause()
+
+        binding.stopwatchOneLayout.buttonStart.setOnClickListener {
+            viewModel.start(NumberStopWatcher.ONE)
         }
-        binding.buttonStop.setOnClickListener {
-            viewModel.stop()
+        binding.stopwatchOneLayout.buttonPause.setOnClickListener {
+            viewModel.pause(NumberStopWatcher.ONE)
+        }
+        binding.stopwatchOneLayout.buttonStop.setOnClickListener {
+            viewModel.stop(NumberStopWatcher.ONE)
+        }
+
+        binding.stopwatchTwoLayout.buttonStart.setOnClickListener {
+            viewModel.start(NumberStopWatcher.TWO)
+        }
+        binding.stopwatchTwoLayout.buttonPause.setOnClickListener {
+            viewModel.pause(NumberStopWatcher.TWO)
+        }
+        binding.stopwatchTwoLayout.buttonStop.setOnClickListener {
+            viewModel.stop(NumberStopWatcher.TWO)
         }
     }
 }

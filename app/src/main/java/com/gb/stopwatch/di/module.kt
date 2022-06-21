@@ -14,21 +14,21 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val module = module {
-    single {
+    factory {
         StopwatchStateHolder(
             stopwatchStateCalculator = get(),
             elapsedTimeCalculator = get(),
             timestampMillisecondsFormatter = get()
         )
     }
-    single {
+    factory {
         StopwatchStateCalculator(
             timestampProvider = get(),
             elapsedTimeCalculator = get()
         )
     }
 
-    single {
+    factory {
         ElapsedTimeCalculator(
             timestampProvider = get()
         )
@@ -40,7 +40,8 @@ val module = module {
 
     viewModel {
         MainViewModel(
-            stopwatchStateHolder = get(),
+            stopwatchStateHolderOne = get(),
+            stopwatchStateHolderTwo = get(),
             scope = get()
         )
     }
